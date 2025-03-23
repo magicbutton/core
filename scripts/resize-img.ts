@@ -39,6 +39,7 @@ async function main() {
 
 					await prisma.blobResized.create({
 						data: {
+							tenant: 'default',
 							width,
 							blobId: item.id,
 							data: resized,

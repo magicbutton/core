@@ -22,15 +22,15 @@ type Translation = z.infer<typeof translationSchema>;
 const translations: Record<SupportedLanguage, Translation> = {
   en: {
     login: "Login",
-    magicbuttons: "Intranet"
+    magicbuttons: "Magic Buttons"
   },
   da: {
     login: "Log ind",
-    magicbuttons: "Intranet"
+    magicbuttons: "Magiske Knapper"
   },
   it: {
     login: "Accesso",
-    magicbuttons: "Intranet"
+    magicbuttons: "Pulsante Magico"
 
   }
 
@@ -146,14 +146,14 @@ export default function Authenticate(props: {
             <div className="flex items-center justify-center mb-2 space-x-4">
 
               <img
-                src="/nexiblue.svg"
-                alt="Nexi Logo"
+                src="/placeholder.svg"
+                alt="Magic Button"
 
-                height={32}
-                className="h-7"
+                height={64}
+                className="h-12"
               />
 
-              <CardTitle className="text-[34px] font-bold text-[#2d32aa]"> intranet</CardTitle>
+              <CardTitle className="text-[34px] font-bold text-[#2d32aa]"> {t.magicbuttons}</CardTitle>
             </div>
 
           </CardHeader>

@@ -67,6 +67,7 @@ export async function actionBoardSaveCopy(
 	try {
 		boardRecord = await prisma.board.create({
 			data: {
+				tenant: 'default',
 				name: name,
 				created_by: user.name,
 				updated_by: user.name,

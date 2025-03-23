@@ -17,6 +17,7 @@ export async function actionFavouriteConnect(sessionToken: string, toolId: numbe
 	try {
 		await prisma.userProfile.update({
 			where: {
+				tenant: 'default',
 				id: session.userId,
 			},
 			data: {
@@ -45,6 +46,7 @@ export async function actionFavouriteDisconnect(sessionToken: string, toolId: nu
 	try {
 		await prisma.userProfile.update({
 			where: {
+				tenant: 'default',
 				id: session.userId,
 			},
 			data: {

@@ -205,7 +205,7 @@ export async function ToolsPage2(props: ToolsPageProps) {
   if (props.excludeGroupTools) {
     tools = tools.filter((tool) => {
 
-      if (tool.category.isGroupTool) {
+      if (tool.category?.isGroupTool) {
 
         return false
       }
@@ -216,7 +216,7 @@ export async function ToolsPage2(props: ToolsPageProps) {
   if (countryNames.length > 0) {
     tools = tools.filter((tool) => {
       let found = false
-      if (!props.excludeGroupTools && tool.category.isGroupTool) {
+      if (!props.excludeGroupTools && tool.category?.isGroupTool) {
         return true
       }
       for (const countryName of countryNames) {
@@ -260,8 +260,8 @@ export async function ToolsPage2(props: ToolsPageProps) {
   //const tools = databaseitems.sort((a, b) => a.name.localeCompare(b.name));
   const sortedTools = tools.sort((a, b) => {
 
-    const toolA: ToolView = mapTool2ToolView(language, a, a.category.name, a.category.color ?? "#444444", a.category.id, "0");
-    const toolB: ToolView = mapTool2ToolView(language, b, b.category.name, b.category.color ?? "#444444", b.category.id, "0");
+    const toolA: ToolView = mapTool2ToolView(language, a, a.category?.name!, a.category?.color ?? "#444444", a.category?.id!, "0");
+    const toolB: ToolView = mapTool2ToolView(language, b, b.category?.name!, b.category?.color ?? "#444444", b.category?.id!, "0");
 
 
     return toolA.name.localeCompare(toolB.name)
@@ -269,8 +269,8 @@ export async function ToolsPage2(props: ToolsPageProps) {
 
   const sortedFavoriteTools = yourTools.sort((a, b) => {
 
-    const toolA: ToolView = mapTool2ToolView(language, a, a.category.name, a.category.color ?? "#444444", a.category.id, "0");
-    const toolB: ToolView = mapTool2ToolView(language, b, b.category.name, b.category.color ?? "#444444", b.category.id, "0");
+    const toolA: ToolView = mapTool2ToolView(language, a, a.category?.name!, a.category?.color ?? "#444444", a.category?.id!, "0");
+    const toolB: ToolView = mapTool2ToolView(language, b, b.category?.name!, b.category?.color ?? "#444444", b.category?.id!, "0");
 
 
     return toolA.name.localeCompare(toolB.name)
@@ -299,7 +299,7 @@ export async function ToolsPage2(props: ToolsPageProps) {
                     {sortedFavoriteTools.map((tool, key): React.JSX.Element => {
                       // const p = tool.purposes.map((purpose) => purpose.name).join(", ");
                       // tool.name = tool.name + " " + p
-                      const toolView: ToolView = mapTool2ToolView(language, tool, tool.category.name, tool.category.color ?? "#444444", tool.category.id, "0");
+                      const toolView: ToolView = mapTool2ToolView(language, tool, tool.category?.name!, tool.category?.color ?? "#444444", tool.category?.id!, "0");
                       return <div key={key} className="p-3" >
                         {/* <ToolCardMiniComponent allowedTags={[]} isFavorite={tool.userProfiles.length > 0} tool={toolView} /> */}
                         {/* <ToolCardMediumComponent allowedTags={[]} isFavorite={tool.userProfiles.length > 0} tool={toolView} searchvalue={props.query} /> */}
@@ -356,7 +356,7 @@ export async function ToolsPage2(props: ToolsPageProps) {
                 </div>}
 
                 {sortedTools.map((tool, key): React.JSX.Element => {
-                  const toolView: ToolView = mapTool2ToolView(language, tool, tool.category.name, tool.category.color ?? "#444444", tool.category.id, "0");
+                  const toolView: ToolView = mapTool2ToolView(language, tool, tool.category?.name!, tool.category?.color ?? "#444444", tool.category?.id!, "0");
                   return <div key={tool.id} className="p-3" >
                     <ToolCardMediumComponent allowedTags={[]} isFavorite={tool.userProfiles.length > 0} tool={toolView} searchvalue={props.query} />
 

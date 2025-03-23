@@ -66,6 +66,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 			// Log the request
 			await prisma.servicesRequestLog.create({
 				data: {
+					tenant: 'default',
 					serviceName: service,
 					requestId,
 					payload,
@@ -141,6 +142,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 				// Log the timeout
 				await prisma.servicesRequestLog.create({
 					data: {
+						tenant: 'default',
 						serviceName: service,
 						requestId,
 						payload,
@@ -201,6 +203,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 			// Log the successful request
 			await prisma.servicesRequestLog.create({
 				data: {
+					tenant: 'default',
 					serviceName: service,
 					requestId,
 					payload,
@@ -231,6 +234,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 			// Log the failed request
 			await prisma.servicesRequestLog.create({
 				data: {
+					tenant: 'default',
 					serviceName: service,
 					requestId,
 					payload,

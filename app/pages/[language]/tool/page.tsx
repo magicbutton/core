@@ -40,6 +40,7 @@ export default async function Page({
       // skip: 0,
       // take: 10,
       where: {
+        tenant: 'default',
         created_by: user.name,
         koksmat_masterdata_id: {
           equals: null
