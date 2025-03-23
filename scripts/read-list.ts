@@ -50,7 +50,12 @@ async function syncRegions(sharePointClient: SharePointGraphClient) {
 	console.log('Number of regions:', items.length);
 	for (const item of items) {
 		await prisma.region.upsert({
-			where: { name: item.Title },
+			where: {
+				tenant_name: {
+					tenant: 'default',
+					name: item.Title,
+				},
+			},
 			update: {
 				created_by: item.createdBy.user.email,
 				updated_by: item.lastModifiedBy.user.email,
@@ -58,6 +63,7 @@ async function syncRegions(sharePointClient: SharePointGraphClient) {
 				sortOrder: item.Title,
 			},
 			create: {
+				tenant: 'default',
 				created_by: item.createdBy.user.email,
 				updated_by: item.lastModifiedBy.user.email,
 
@@ -74,7 +80,13 @@ async function syncCategories(sharePointClient: SharePointGraphClient) {
 	console.log('Number of news categories:', items.length);
 	for (const item of items) {
 		await prisma.channelCategory.upsert({
-			where: { name: item.Title },
+			where: {
+				tenant_name: {
+					tenant: 'default',
+					name: item.Title,
+				},
+			},
+
 			update: {
 				created_by: item.createdBy.user.email,
 				updated_by: item.lastModifiedBy.user.email,
@@ -82,6 +94,7 @@ async function syncCategories(sharePointClient: SharePointGraphClient) {
 				sortorder: item.SortOrder.toString(),
 			},
 			create: {
+				tenant: 'default',
 				created_by: item.createdBy.user.email,
 				updated_by: item.lastModifiedBy.user.email,
 
@@ -112,7 +125,13 @@ async function syncCountries(sharePointClient: SharePointGraphClient) {
 			continue;
 		}
 		await prisma.country.upsert({
-			where: { name: item.Title },
+			where: {
+				tenant_name: {
+					tenant: 'default',
+					name: item.Title,
+				},
+			},
+
 			update: {
 				created_by: item.createdBy.user.email,
 				updated_by: item.lastModifiedBy.user.email,
@@ -121,6 +140,7 @@ async function syncCountries(sharePointClient: SharePointGraphClient) {
 				region_id: region_id,
 			},
 			create: {
+				tenant: 'default',
 				created_by: item.createdBy.user.email,
 				updated_by: item.lastModifiedBy.user.email,
 
@@ -139,7 +159,13 @@ async function syncUnits(sharePointClient: SharePointGraphClient) {
 	console.log('Number of units:', items.length);
 	for (const item of items) {
 		await prisma.businessUnit.upsert({
-			where: { name: item.Title },
+			where: {
+				tenant_name: {
+					tenant: 'default',
+					name: item.Title,
+				},
+			},
+
 			update: {
 				created_by: item.createdBy.user.email,
 				updated_by: item.lastModifiedBy.user.email,
@@ -151,6 +177,7 @@ async function syncUnits(sharePointClient: SharePointGraphClient) {
 				code: item.code,
 			},
 			create: {
+				tenant: 'default',
 				created_by: item.createdBy.user.email,
 				updated_by: item.lastModifiedBy.user.email,
 
@@ -201,7 +228,13 @@ async function syncChannels(sharePointClient: SharePointGraphClient) {
 		);
 
 		await prisma.channel.upsert({
-			where: { name: item.Title },
+			where: {
+				tenant_name: {
+					tenant: 'default',
+					name: item.Title,
+				},
+			},
+
 			update: {
 				created_by: 'system',
 				updated_by: 'system',
@@ -214,6 +247,7 @@ async function syncChannels(sharePointClient: SharePointGraphClient) {
 				},
 			},
 			create: {
+				tenant: 'default',
 				created_by: 'system',
 				updated_by: 'system',
 				externalGroup: item.GroupID,
