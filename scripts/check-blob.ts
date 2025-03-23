@@ -7,6 +7,7 @@ async function main() {
 
 	const blobItems = await prisma.tool.findMany({
 		where: {
+			tenant: 'default',
 			icon: {
 				contains: '/blob/',
 			},

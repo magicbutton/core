@@ -22,9 +22,13 @@ async function main() {
 			console.log(item.name);
 			let blob = await prisma.blob.upsert({
 				where: {
-					hash,
+					tenant_name: {
+						tenant: 'default',
+						name: hash,
+					},
 				},
 				create: {
+					tenant: 'default',
 					data: image,
 					content_type: 'image/png',
 					hash,
