@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
 		// Create the API key
 		const apiKey = await prisma.servicesApiKey.create({
 			data: {
+				tenant: 'default',
 				key,
 				name: body.name,
 				description: body.description,

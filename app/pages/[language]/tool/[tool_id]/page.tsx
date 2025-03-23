@@ -43,6 +43,7 @@ export async function generateMetadata({
 
   const tool = await prisma.tool.findFirst({
     where: {
+      tenant: 'default',
       id: parseInt(tool_id),
       ToolTexts: {
 

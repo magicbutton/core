@@ -1,48 +1,42 @@
-import { PrismaClient, Prisma } from "@prisma/client";
+import prisma from '@/prisma';
 
-const prisma = new PrismaClient();
-prisma.tool.findMany().then((tools) => {
-  tools.forEach((tool) => {
-    console.log(tool.name);
-  });
-});
+async function roles() {
+	await prisma.userRole.create({
+		data: {
+			name: 'superadmin',
+			description: 'Super Admin',
+			tenant: 'default',
+		},
+	});
+	await prisma.userRole.create({
+		data: {
+			name: 'ring1',
+			description: 'Ring 1',
+			tenant: 'default',
+		},
+	});
+	await prisma.userRole.create({
+		data: {
+			name: 'dev',
+			description: 'Developer',
+			tenant: 'default',
+		},
+	});
 
-// const userData: Prisma.UserCreateInput[] = [
-//   {
-//     name: "Alice",
-//     email: "alice@prisma.io",
-//     posts: {
-//       create: [
-//         {
-//           title: "Join the Prisma Discord",
+	console.log('done');
+}
+async function connectToles() {
+	await prisma.userProfile.update({
+		where: { id: 1 },
+		data: {
+			roles: {
+				connect: [{ id: 1 }, { id: 2 }, { id: 3 }],
+			},
+		},
+	});
 
-//           published: true,
-//         },
-//         {
-//           title: "Prisma on YouTube",
-//         },
-//       ],
-//     },
-//   },
-//   {
-//     name: "Bob",
-//     email: "bob@prisma.io",
-//     posts: {
-//       create: [
-//         {
-//           title: "Follow Prisma on Twitter",
+	console.log('done');
+}
 
-//           published: true,
-//         },
-//       ],
-//     },
-//   },
-// ];
-
-// export async function main() {
-//   for (const u of userData) {
-//     await prisma.user.create({ data: u });
-//   }
-// }
-
-// main();
+//roles();
+connectToles();

@@ -43,7 +43,12 @@ export const MagicboxProvider = ({ children }: Props) => {
 
   const [showtracer, setshowtracer] = useState(false);
   const [initializing, setinitializing] = useState(true)
+  const [tenant, settenant] = useState("default")
   const magicbox: MagicboxContextType = {
+    tenant,
+    setTenant: function (tenant: string): void {
+      settenant(tenant);
+    },
     userProfile,
     initializing,
     setInitializing: function (initializing: boolean): void {

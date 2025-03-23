@@ -114,6 +114,7 @@ async function upsertToolTranslations(
 			description: getTranslation(translations, 'description', 'en', sharePointItem.DescriptionEnglish!),
 		},
 		create: {
+			tenant: 'default',
 			name: getTranslation(translations, 'name', 'en', sharePointItem.TitleEnglish!),
 			description: getTranslation(translations, 'description', 'en', sharePointItem.DescriptionEnglish!),
 			tool: { connect: { id: dbItem.id } },
@@ -134,6 +135,7 @@ async function upsertToolTranslations(
 			description: getTranslation(translations, 'description', 'it', sharePointItem.DescriptionEnglish!),
 		},
 		create: {
+			tenant: 'default',
 			name: getTranslation(translations, 'name', 'it', sharePointItem.TitleEnglish!),
 			description: getTranslation(translations, 'description', 'it', sharePointItem.DescriptionEnglish!),
 			tool: { connect: { id: dbItem.id } },
@@ -195,6 +197,7 @@ export class ToolsApp {
 					roles: true,
 				},
 			});
+
 			if (!userProfile) {
 				throw new Error('User not found');
 			}
@@ -206,6 +209,7 @@ export class ToolsApp {
 	async writeSyncLogInfo(category: SynclogTypes, details: object) {
 		await prisma.synchronizationLog.create({
 			data: {
+				tenant: 'default',
 				name: 'Syncronising Tools',
 				category,
 				details,
@@ -217,6 +221,7 @@ export class ToolsApp {
 		try {
 			await prisma.synchronizationLog.create({
 				data: {
+					tenant: 'default',
 					name: 'Syncronising Tools',
 					category,
 					details,
@@ -323,6 +328,7 @@ export class ToolsApp {
 		site: ToolSpokeSite,
 		options: { force: boolean } = { force: false },
 	) {
+		throw new Error('Method not implemented in Cloud version.');
 		{
 			this.log.info('Tool:', name, format);
 
@@ -348,22 +354,24 @@ export class ToolsApp {
 			let created = 0;
 			let updated = 0;
 			let deleted = 0; // Ensure the Languages exist (if not done elsewhere)
-			const englishLanguage = await prisma.language.upsert({
-				where: { name: 'English' },
-				update: {},
-				create: { name: 'English', code: 'en' },
-			});
-			const italianLanguage = await prisma.language.upsert({
-				where: { name: 'Italian' },
-				update: {},
-				create: { name: 'Italian', code: 'it' },
-			});
+			// const englishLanguage = await prisma.language.upsert({
+			// 	where: {
+			// 		tenant: 'default',
+			// 		name: 'English' },
+			// 	update: {},
+			// 	create: { tenant: 'default',name: 'English', code: 'en' },
+			// });
+			// const italianLanguage = await prisma.language.upsert({
+			// 	where: { name: 'Italian' },
+			// 	update: {},
+			// 	create: { name: 'Italian', code: 'it' },
+			// });
 
 			await Promise.all(
 				items.map(async sharePointItem => {
-					const result = await this.syncItem(site, sharePointItem, koksmat_masterdataref, options);
-					if (result?.created) created++;
-					if (result?.updated) updated++;
+					// const result = await this.syncItem(site, sharePointItem, koksmat_masterdataref, options);
+					// if (result?.created) created++;
+					// if (result?.updated) updated++;
 				}),
 			);
 
@@ -380,237 +388,245 @@ export class ToolsApp {
 		koksmat_masterdataref: string,
 		options: { force: boolean } = { force: false },
 	) {
-		const englishLanguage = await prisma.language.upsert({
-			where: { name: 'English' },
-			update: {},
-			create: { name: 'English', code: 'en' },
-		});
-		const italianLanguage = await prisma.language.upsert({
-			where: { name: 'Italian' },
-			update: {},
-			create: { name: 'Italian', code: 'it' },
-		});
-		const dbItem = await prisma.tool.findFirst({
-			where: {
-				koksmat_masterdataref: koksmat_masterdataref,
-				koksmat_masterdata_id: sharePointItem.id,
-			},
-		});
-		const result = {
-			created: 0,
-			updated: 0,
-			deleted: 0,
-		};
+		throw new Error('Method not implemented.');
+		// const englishLanguage = await prisma.language.upsert({
+		// 	where: {
+		// 		tenant: 'default',
+		// 		name: 'English' },
+		// 	update: {},
+		// 	create: {
+		// 		tenant: 'default',
+		// 		name: 'English', code: 'en' },
+		// });
+		// const italianLanguage = await prisma.language.upsert({
+		// 	where: { name: 'Italian' },
+		// 	update: {},
+		// 	create: { name: 'Italian', code: 'it' },
+		// });
+		// const dbItem = await prisma.tool.findFirst({
+		// 	where: {
+		// 		koksmat_masterdataref: koksmat_masterdataref,
+		// 		koksmat_masterdata_id: sharePointItem.id,
+		// 	},
+		// });
+		// const result = {
+		// 	created: 0,
+		// 	updated: 0,
+		// 	deleted: 0,
+		// };
 
-		const translations = ToolsApp.buildTranslations(sharePointItem);
-		if (dbItem) {
-			if (dbItem.koksmat_masterdata_etag === sharePointItem._UIVersionString && !options.force) {
-				this.log.verbose(
-					`SharePoint : ${sharePointItem.id}`,
-					koksmat_masterdataref,
-					sharePointItem.id,
-					sharePointItem._UIVersionString,
-					'No changes',
-				);
-				return result;
-			}
-			/**
-			 *  --------------------------------------------------------------------------------
-			 *  Updating
-			 *  --------------------------------------------------------------------------------
-			 *  */
-			this.log.info(
-				`SharePoint : ${sharePointItem.id}`,
-				koksmat_masterdataref,
-				sharePointItem.id,
-				sharePointItem._UIVersionString,
-				'Updating item',
-			);
+		// const translations = ToolsApp.buildTranslations(sharePointItem);
+		// if (dbItem) {
+		// 	if (dbItem.koksmat_masterdata_etag === sharePointItem._UIVersionString && !options.force) {
+		// 		this.log.verbose(
+		// 			`SharePoint : ${sharePointItem.id}`,
+		// 			koksmat_masterdataref,
+		// 			sharePointItem.id,
+		// 			sharePointItem._UIVersionString,
+		// 			'No changes',
+		// 		);
+		// 		return result;
+		// 	}
+		// 	/**
+		// 	 *  --------------------------------------------------------------------------------
+		// 	 *  Updating
+		// 	 *  --------------------------------------------------------------------------------
+		// 	 *  */
+		// 	this.log.info(
+		// 		`SharePoint : ${sharePointItem.id}`,
+		// 		koksmat_masterdataref,
+		// 		sharePointItem.id,
+		// 		sharePointItem._UIVersionString,
+		// 		'Updating item',
+		// 	);
 
-			const image = await site.getSharePointFirstItemAttachment(
-				await site.getToolListName(),
-				parseInt(sharePointItem.id),
-			);
-			try {
-				// Now run the update and upserts in a transaction:
-				const updatedRecord = await prisma.$transaction(async tx => {
-					// Update the Tool record
-					/**
-					 * Updates a tool record in the database with the provided SharePoint item data.
-					 *
-					 * @param {Object} tx - The transaction object used to perform the update.
-					 * @param {Object} dbItem - The database item to be updated.
-					 * @param {Object} sharePointItem - The SharePoint item containing the updated data.
-					 * @returns {Promise<Object>} The updated tool record.
-					 *
-					 * @property {string} koksmat_masterdata_etag - The eTag from the SharePoint item.
-					 * @property {string} name - The English title of the SharePoint item.
-					 * @property {string} description - The English description of the SharePoint item.
-					 * @property {string} updated_by - The user who updated the SharePoint item.
-					 * @property {string} created_by - The user who created the SharePoint item.
-					 * @property {Object} documents - The document collection built from the SharePoint item.
-					 * @property {Object} translations - The translations built from the SharePoint item.
-					 * @property {Object} purposes - The business purpose of the tool, connected or created if not existing.
-					 * @property {Object} category - The category of the tool, connected or created if not existing.
-					 */
-					const countryLookup: Map<string, Country> = new Map();
-					const countries = await prisma.country.findMany();
-					const countryReferences = [];
-					if (sharePointItem.id === '47') {
-						console.log(1);
-					}
-					if (sharePointItem.Countries) {
-						for (const country of sharePointItem.Countries) {
-							if (!countryLookup.has(country.LookupValue)) {
-								const countryRecord = countries.find(c => c.name === country.LookupValue);
-								if (countryRecord) {
-									countryLookup.set(country.LookupValue, countryRecord);
-								} else {
-									const newCountry = await tx.country.create({
-										data: {
-											name: country.LookupValue,
-											region: {
-												connectOrCreate: {
-													where: {
-														name: 'Unknown',
-													},
-													create: {
-														name: 'Unknown',
-													},
-												},
-											},
-										},
-									});
-									countryLookup.set(country.LookupValue, newCountry);
-								}
-								countryReferences.push({ id: countryRecord?.id! });
-							}
-						}
-					}
-					sharePointItem?.Countries
-						? sharePointItem?.Countries.map(async country => {
-								return await prisma.country.findFirst({
-									where: { name: country.LookupValue },
-								});
-						  })
-						: [];
-					const updatedTool = await tx.tool.update({
-						where: { id: dbItem.id },
-						data: {
-							koksmat_masterdata_etag: sharePointItem._UIVersionString,
-							name: sharePointItem.TitleEnglish,
-							description: sharePointItem.DescriptionEnglish,
-							updated_by: sharePointItem.UpdateBy,
-							created_by: sharePointItem.CreatedBy,
-							icon: image!,
-							documents: ToolsApp.buildDocumentCollection(sharePointItem),
-							translations: ToolsApp.buildTranslations(sharePointItem),
-							countries: {
-								set: countryReferences,
-							},
-							purposes: {
-								connectOrCreate: {
-									where: {
-										name: sharePointItem.Business_Purpose?.Label ?? 'Unknown',
-									},
-									create: {
-										name: sharePointItem.Business_Purpose?.Label ?? 'Unknown',
-									},
-								},
-							},
-							category: {
-								connectOrCreate: {
-									where: { name: sharePointItem.Category },
-									create: { name: sharePointItem.Category },
-								},
-							},
-						},
-					});
+		// 	const image = await site.getSharePointFirstItemAttachment(
+		// 		await site.getToolListName(),
+		// 		parseInt(sharePointItem.id),
+		// 	);
+		// 	try {
+		// 		// Now run the update and upserts in a transaction:
+		// 		const updatedRecord = await prisma.$transaction(async tx => {
+		// 			// Update the Tool record
+		// 			/**
+		// 			 * Updates a tool record in the database with the provided SharePoint item data.
+		// 			 *
+		// 			 * @param {Object} tx - The transaction object used to perform the update.
+		// 			 * @param {Object} dbItem - The database item to be updated.
+		// 			 * @param {Object} sharePointItem - The SharePoint item containing the updated data.
+		// 			 * @returns {Promise<Object>} The updated tool record.
+		// 			 *
+		// 			 * @property {string} koksmat_masterdata_etag - The eTag from the SharePoint item.
+		// 			 * @property {string} name - The English title of the SharePoint item.
+		// 			 * @property {string} description - The English description of the SharePoint item.
+		// 			 * @property {string} updated_by - The user who updated the SharePoint item.
+		// 			 * @property {string} created_by - The user who created the SharePoint item.
+		// 			 * @property {Object} documents - The document collection built from the SharePoint item.
+		// 			 * @property {Object} translations - The translations built from the SharePoint item.
+		// 			 * @property {Object} purposes - The business purpose of the tool, connected or created if not existing.
+		// 			 * @property {Object} category - The category of the tool, connected or created if not existing.
+		// 			 */
+		// 			const countryLookup: Map<string, Country> = new Map();
+		// 			const countries = await prisma.country.findMany();
+		// 			const countryReferences = [];
+		// 			if (sharePointItem.id === '47') {
+		// 				console.log(1);
+		// 			}
+		// 			if (sharePointItem.Countries) {
+		// 				for (const country of sharePointItem.Countries) {
+		// 					if (!countryLookup.has(country.LookupValue)) {
+		// 						const countryRecord = countries.find(c => c.name === country.LookupValue);
+		// 						if (countryRecord) {
+		// 							countryLookup.set(country.LookupValue, countryRecord);
+		// 						} else {
+		// 							const newCountry = await tx.country.create({
+		// 								data: {
+		// 									name: country.LookupValue,
+		// 									tenant: 'default',
+		// 									region: {
+		// 										connectOrCreate: {
+		// 											where: {
+		// 												tenant: 'default',
+		// 												name: 'Unknown',
+		// 											},
+		// 											create: {
+		// 												tenant: 'default',
+		// 												name: 'Unknown',
+		// 											},
+		// 										},
+		// 									},
+		// 								},
+		// 							});
+		// 							countryLookup.set(country.LookupValue, newCountry);
+		// 						}
+		// 						countryReferences.push({ id: countryRecord?.id! });
+		// 					}
+		// 				}
+		// 			}
+		// 			sharePointItem?.Countries
+		// 				? sharePointItem?.Countries.map(async country => {
+		// 						return await prisma.country.findFirst({
+		// 							where: { name: country.LookupValue },
+		// 						});
+		// 				  })
+		// 				: [];
+		// 			const updatedTool = await tx.tool.update({
+		// 				where: { id: dbItem.id },
+		// 				data: {
+		// 					koksmat_masterdata_etag: sharePointItem._UIVersionString,
+		// 					name: sharePointItem.TitleEnglish,
+		// 					description: sharePointItem.DescriptionEnglish,
+		// 					updated_by: sharePointItem.UpdateBy,
+		// 					created_by: sharePointItem.CreatedBy,
+		// 					icon: image!,
+		// 					documents: ToolsApp.buildDocumentCollection(sharePointItem),
+		// 					translations: ToolsApp.buildTranslations(sharePointItem),
+		// 					countries: {
+		// 						set: countryReferences,
+		// 					},
+		// 					purposes: {
+		// 						connectOrCreate: {
+		// 							where: {
+		// 								name: sharePointItem.Business_Purpose?.Label ?? 'Unknown',
+		// 							},
+		// 							create: {
+		// 								name: sharePointItem.Business_Purpose?.Label ?? 'Unknown',
+		// 							},
+		// 						},
+		// 					},
+		// 					category: {
+		// 						connectOrCreate: {
+		// 							where: { name: sharePointItem.Category },
+		// 							create: { name: sharePointItem.Category },
+		// 						},
+		// 					},
+		// 				},
+		// 			});
 
-					await upsertToolTranslations(
-						tx,
-						dbItem,
-						englishLanguage,
-						translations,
-						sharePointItem,
-						italianLanguage,
-					);
+		// 			await upsertToolTranslations(
+		// 				tx,
+		// 				dbItem,
+		// 				englishLanguage,
+		// 				translations,
+		// 				sharePointItem,
+		// 				italianLanguage,
+		// 			);
 
-					return updatedTool;
-				});
-				this.log.info('Updated', updatedRecord.id);
-				result.updated++;
-				await this.writeSyncLogInfo('update', {
-					sharePointItem,
-					updatedRecord,
-				});
-			} catch (error) {
-				this.log.error('Syncronising Tools', (error as Error).message);
-				await this.writeSyncLogError('update', { sharePointItem }, error as Error);
-			}
-		} else {
-			/**
-			 *  --------------------------------------------------------------------------------
-			 *  Creating
-			 *  --------------------------------------------------------------------------------
-			 *  */
+		// 			return updatedTool;
+		// 		});
+		// 		this.log.info('Updated', updatedRecord.id);
+		// 		result.updated++;
+		// 		await this.writeSyncLogInfo('update', {
+		// 			sharePointItem,
+		// 			updatedRecord,
+		// 		});
+		// 	} catch (error) {
+		// 		this.log.error('Syncronising Tools', (error as Error).message);
+		// 		await this.writeSyncLogError('update', { sharePointItem }, error as Error);
+		// 	}
+		// } else {
+		// 	/**
+		// 	 *  --------------------------------------------------------------------------------
+		// 	 *  Creating
+		// 	 *  --------------------------------------------------------------------------------
+		// 	 *  */
 
-			this.log.info(
-				`SharePoint : ${sharePointItem.id}`,
-				koksmat_masterdataref,
-				sharePointItem.id,
-				sharePointItem._UIVersionString,
-				'New item',
-			);
-			try {
-				const newRecord = await prisma.tool.create({
-					data: {
-						// Don't set eTag for new records to ensure that the update is triggered on the next sync
-						koksmat_masterdata_etag: '', // sharePointItem._UIVersionString,
-						koksmat_masterdata_id: sharePointItem.id,
-						koksmat_masterdataref: koksmat_masterdataref,
-						updated_by: sharePointItem.UpdateBy,
-						created_by: sharePointItem.CreatedBy,
-						documents: ToolsApp.buildDocumentCollection(sharePointItem),
-						url: sharePointItem.Link.Url,
-						purposes: {
-							connectOrCreate: {
-								where: {
-									name: sharePointItem.Business_Purpose?.Label ?? 'Unknown',
-								},
-								create: {
-									name: sharePointItem.Business_Purpose?.Label ?? 'Unknown',
-								},
-							},
-						},
+		// 	this.log.info(
+		// 		`SharePoint : ${sharePointItem.id}`,
+		// 		koksmat_masterdataref,
+		// 		sharePointItem.id,
+		// 		sharePointItem._UIVersionString,
+		// 		'New item',
+		// 	);
+		// 	try {
+		// 		const newRecord = await prisma.tool.create({
+		// 			data: {
+		// 				// Don't set eTag for new records to ensure that the update is triggered on the next sync
+		// 				koksmat_masterdata_etag: '', // sharePointItem._UIVersionString,
+		// 				koksmat_masterdata_id: sharePointItem.id,
+		// 				koksmat_masterdataref: koksmat_masterdataref,
+		// 				updated_by: sharePointItem.UpdateBy,
+		// 				created_by: sharePointItem.CreatedBy,
+		// 				documents: ToolsApp.buildDocumentCollection(sharePointItem),
+		// 				url: sharePointItem.Link.Url,
+		// 				purposes: {
+		// 					connectOrCreate: {
+		// 						where: {
+		// 							name: sharePointItem.Business_Purpose?.Label ?? 'Unknown',
+		// 						},
+		// 						create: {
+		// 							name: sharePointItem.Business_Purpose?.Label ?? 'Unknown',
+		// 						},
+		// 					},
+		// 				},
 
-						category: {
-							connectOrCreate: {
-								where: {
-									name: sharePointItem.Category,
-								},
-								create: {
-									name: sharePointItem.Category,
-								},
-							},
-						},
-						name: sharePointItem.TitleEnglish!,
-						description: sharePointItem.DescriptionEnglish!,
-					},
-				});
-				await this.writeSyncLogInfo('create', {
-					sharePointItem,
-					newRecord,
-				});
+		// 				category: {
+		// 					connectOrCreate: {
+		// 						where: {
+		// 							name: sharePointItem.Category,
+		// 						},
+		// 						create: {
+		// 							name: sharePointItem.Category,
+		// 						},
+		// 					},
+		// 				},
+		// 				name: sharePointItem.TitleEnglish!,
+		// 				description: sharePointItem.DescriptionEnglish!,
+		// 			},
+		// 		});
+		// 		await this.writeSyncLogInfo('create', {
+		// 			sharePointItem,
+		// 			newRecord,
+		// 		});
 
-				this.log.info('Created', newRecord.id);
-				result.created++;
-			} catch (error) {
-				this.log.error('Syncronising Tools', (error as Error).message);
-				await this.writeSyncLogError('create', { sharePointItem }, error as Error);
-			}
-		}
-		return result;
+		// 		this.log.info('Created', newRecord.id);
+		// 		result.created++;
+		// 	} catch (error) {
+		// 		this.log.error('Syncronising Tools', (error as Error).message);
+		// 		await this.writeSyncLogError('create', { sharePointItem }, error as Error);
+		// 	}
+		// }
+		// return result;
 	}
 
 	async syncUserProfiles(

@@ -39,8 +39,12 @@ export async function POST(request: NextRequest) {
 		}
 
 		// Check if service already exists
-		const existingService = await prisma.servicesService.findUnique({
-			where: { name: body.name },
+		const existingService = await prisma.servicesService.findFirst({
+			where: {
+				tenant: 'default',
+
+				name: body.name,
+			},
 		});
 
 		if (existingService) {
@@ -50,6 +54,7 @@ export async function POST(request: NextRequest) {
 		// Create the service
 		const service = await prisma.servicesService.create({
 			data: {
+				tenant: 'default',
 				name: body.name,
 				purpose: body.purpose,
 				active: body.active !== undefined ? body.active : true,

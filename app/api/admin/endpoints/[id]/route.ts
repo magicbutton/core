@@ -99,11 +99,13 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 				await tx.servicesResponseSchema.create({
 					data: {
 						type: body.responseSchema.type,
+						tenant: 'default',
 						endpointId: id,
 						properties: {
 							createMany: {
 								data: Object.entries(body.responseSchema.properties).map(
 									([name, prop]: [string, any]) => ({
+										tenant: 'default',
 										name,
 										type: prop.type,
 										description: prop.description,

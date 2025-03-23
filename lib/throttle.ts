@@ -149,6 +149,7 @@ export async function checkThrottleLimit(options: ThrottleOptions): Promise<{
 			// Create a new record if none exists
 			return prisma.servicesUsageRecord.create({
 				data: {
+					tenant: 'default',
 					[period]: date,
 					count: 0,
 					...(endpoint ? { endpointId: endpoint.id } : {}),

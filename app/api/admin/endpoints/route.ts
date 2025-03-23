@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
 		// Create the endpoint
 		const endpoint = await prisma.servicesEndpoint.create({
 			data: {
+				tenant: 'default',
 				name: body.name,
 				description: body.description,
 				version: body.version,
@@ -61,11 +62,13 @@ export async function POST(request: NextRequest) {
 				responseSchema: body.responseSchema
 					? {
 							create: {
+								tenant: 'default',
 								type: body.responseSchema.type,
 								properties: {
 									createMany: {
 										data: Object.entries(body.responseSchema.properties).map(
 											([name, prop]: [string, any]) => ({
+												tenant: 'default',
 												name,
 												type: prop.type,
 												description: prop.description,

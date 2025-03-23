@@ -14,10 +14,8 @@ generator client {
 // }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-  schemas   = ["core"]
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Tenant {
@@ -29,7 +27,6 @@ model Tenant {
   updatedAt DateTime @updatedAt
 
   @@index([slug])
-  @@schema("core")
 }
 
 model SynchronizationLog {
@@ -46,8 +43,6 @@ model SynchronizationLog {
   details     Json?
   hasError    Boolean   @db.Boolean
   error       String?   @db.VarChar
-
-  @@schema("core")
 }
 
 model AccessPoint {
@@ -64,7 +59,6 @@ model AccessPoint {
   sortorder    String?   @db.VarChar
 
   @@unique([tenant, name])
-  @@schema("core")
 }
 
 model AuditLog {
@@ -84,8 +78,6 @@ model AuditLog {
   entityid     String    @db.VarChar
   actor        String    @db.VarChar
   metadata     Json?
-
-  @@schema("core")
 }
 
 model Board {
@@ -108,8 +100,6 @@ model Board {
   managedBy     UserProfile[]
   groupOwnerId  String?       @db.VarChar
   groupViewerId String?       @db.VarChar
-
-  @@schema("core")
 }
 
 model Category {
@@ -129,7 +119,6 @@ model Category {
   tool         Tool[]
 
   @@unique([tenant, name])
-  @@schema("core")
 }
 
 model Country {
@@ -152,7 +141,6 @@ model Country {
   tools        Tool[]
 
   @@unique([tenant, name])
-  @@schema("core")
 }
 
 model Language {
@@ -171,7 +159,6 @@ model Language {
   ToolTexts    ToolTexts[]
 
   @@unique([tenant, name])
-  @@schema("core")
 }
 
 model Purpose {
@@ -191,7 +178,6 @@ model Purpose {
   tools Tool[] @relation("ToolPurposes")
 
   @@unique([tenant, name])
-  @@schema("core")
 }
 
 model Region {
@@ -210,7 +196,6 @@ model Region {
   Channel      Channel[]
 
   @@unique([tenant, name])
-  @@schema("core")
 }
 
 model Setting {
@@ -227,7 +212,6 @@ model Setting {
   data         Json?
 
   @@unique([tenant, name])
-  @@schema("core")
 }
 
 /// Tool
@@ -256,10 +240,10 @@ model Tool {
   metadata                Json?
   icon                    String?       @db.VarChar
   uploaded_icon           String?       @db.VarChar
-  category                Category      @relation(fields: [categoryId], references: [id])
+  category                Category?     @relation(fields: [categoryId], references: [id])
   // Many-to-many relation with Purpose
   purposes                Purpose[]     @relation("ToolPurposes")
-  categoryId              Int
+  categoryId              Int?
   userProfiles            UserProfile[]
   countries               Country[]
   ToolTexts               ToolTexts[]
@@ -269,8 +253,6 @@ model Tool {
   groupOwnerId            String?       @db.VarChar
   groupViewerId           String?       @db.VarChar
   Blob                    Blob[]
-
-  @@schema("core")
 }
 
 model ToolTexts {
@@ -292,15 +274,6 @@ model ToolTexts {
 
   // Add a composite unique constraint with an explicit name:
   @@unique([toolId, languageId], name: "toolId_languageId")
-  @@schema("core")
-}
-
-enum Status {
-  GLOBAL
-  GROUP
-  PERSONAL
-
-  @@schema("core")
 }
 
 model ToolGroup {
@@ -317,11 +290,10 @@ model ToolGroup {
   status       String?       @db.VarChar
   metadata     Json?
   owners       UserProfile[]
-  visibility   Status        @default(PERSONAL)
-  userGroups   UserGroup[]
+
+  userGroups UserGroup[]
 
   @@unique([tenant, name])
-  @@schema("core")
 }
 
 model UserGroup {
@@ -340,7 +312,6 @@ model UserGroup {
   ToolGroup ToolGroup[]
 
   @@unique([tenant, name])
-  @@schema("core")
 }
 
 model UserProfile {
@@ -379,7 +350,6 @@ model UserProfile {
   homePage  String?
 
   @@unique([tenant, name])
-  @@schema("core")
 }
 
 model UserRole {
@@ -397,7 +367,6 @@ model UserRole {
   users        UserProfile[]
 
   @@unique([tenant, name])
-  @@schema("core")
 }
 
 model Session {
@@ -412,8 +381,6 @@ model Session {
   data          Json?
   user          UserProfile @relation(fields: [userProfileId], references: [id])
   userProfileId Int
-
-  @@schema("core")
 }
 
 model BusinessUnit {
@@ -435,7 +402,6 @@ model BusinessUnit {
 
   @@unique([tenant, name])
   @@unique([tenant, code])
-  @@schema("core")
 }
 
 model GuestDomain {
@@ -452,7 +418,6 @@ model GuestDomain {
   sortorder    String?   @db.VarChar
 
   @@unique([tenant, name])
-  @@schema("core")
 }
 
 model ChannelCategory {
@@ -470,7 +435,6 @@ model ChannelCategory {
   Channel      Channel[]
 
   @@unique([tenant, name])
-  @@schema("core")
 }
 
 model Channel {
@@ -495,7 +459,6 @@ model Channel {
   categoryId    Int?
 
   @@unique([tenant, name])
-  @@schema("core")
 }
 
 model Blob {
@@ -516,7 +479,6 @@ model Blob {
   BlobResized    BlobResized[]
 
   @@unique([tenant, name])
-  @@schema("core")
 }
 
 model BlobResized {
@@ -526,8 +488,6 @@ model BlobResized {
   data   Bytes
   blob   Blob   @relation(fields: [blobId], references: [id])
   blobId Int
-
-  @@schema("core")
 }
 
 // Service model to store information about each microservice
@@ -550,7 +510,6 @@ model ServicesService {
 
   @@unique([tenant, name])
   @@index([name])
-  @@schema("core")
 }
 
 // Tag model for categorizing services
@@ -564,7 +523,6 @@ model ServicesTag {
 
   @@unique([tenant, name])
   @@index([name])
-  @@schema("core")
 }
 
 // Endpoint model to store information about each service endpoint
@@ -592,7 +550,6 @@ model ServicesEndpoint {
   @@index([name])
   @@index([deprecated])
   @@index([version])
-  @@schema("core")
 }
 
 // Parameter model to store information about endpoint parameters
@@ -611,7 +568,6 @@ model ServicesParameter {
   @@unique([endpointId, name])
   @@index([name])
   @@index([type])
-  @@schema("core")
 }
 
 // ResponseSchema model to store information about endpoint response schemas
@@ -624,8 +580,6 @@ model ServicesResponseSchema {
   endpoint   ServicesEndpoint         @relation(fields: [endpointId], references: [id], onDelete: Cascade)
   endpointId String                   @unique
   properties ServicesSchemaProperty[]
-
-  @@schema("core")
 }
 
 // SchemaProperty model to store information about response schema properties
@@ -644,7 +598,6 @@ model ServicesSchemaProperty {
   @@unique([responseSchemaId, name])
   @@index([name])
   @@index([type])
-  @@schema("core")
 }
 
 // RequestLog model to store information about service requests
@@ -669,7 +622,6 @@ model ServicesRequestLog {
   @@index([status])
   @@index([createdAt])
   @@index([apiKeyId])
-  @@schema("core")
 }
 
 // ApiKey model for authentication
@@ -692,7 +644,6 @@ model ServicesApiKey {
 
   @@index([key])
   @@index([active])
-  @@schema("core")
 }
 
 // UsageRecord model to track usage for throttling
@@ -729,5 +680,4 @@ model ServicesUsageRecord {
   @@index([hour])
   @@index([day])
   @@index([clientIp])
-  @@schema("core")
 }

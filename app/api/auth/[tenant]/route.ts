@@ -21,6 +21,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 		const accessToken = await createAccessToken(user.id, user.displayName ?? user.email, user.email, user.roles);
 		await prisma.auditLog.create({
 			data: {
+				tenant: 'default',
 				actor: user.email,
 				name: 'createAccessToken',
 				status: 'success',
@@ -35,6 +36,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 		console.error('Error validating idtoken:', error);
 		await prisma.auditLog.create({
 			data: {
+				tenant: 'default',
 				actor: 'system',
 				name: 'createAccessToken',
 				status: 'error',

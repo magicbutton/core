@@ -80,7 +80,7 @@ export async function ToolPage(props: { id: number, language: SupportedLanguage 
     canEdit = tool.created_by === user.name;
   }
 
-  const toolView: ToolView = mapTool2ToolView(language, tool, tool.category.name, tool.category.color ?? "#444444", tool.category.id, "0");
+  const toolView: ToolView = mapTool2ToolView(language, tool, "", "#444444", -1, "0");
   return (<div className="p-3" >
     <ToolCard
       id={tool.id}

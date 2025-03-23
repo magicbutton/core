@@ -1,11 +1,11 @@
 export const APPNAME = 'tools';
 export const APPDISPLAYNAME = 'Magic Button';
-export const CLARITY = 'luhqg4xhfv';
-export const APPINSIGHTS = 'be3445e2-ecfa-4361-bcde-d66d43d36d83';
+export const CLARITY = 'x';
+export const APPINSIGHTS = 'x';
 export const MSAL = {
-	clientId: '902987fd-0ebd-4963-a92b-f200990bb176',
+	clientId: '1aedc227-daf1-495b-9928-2f8ede1fc844',
 
-	authority: 'https://login.microsoftonline.com/79dc228f-c8f2-4016-8bf0-b990b6c72e98',
+	authority: 'https://login.microsoftonline.com/df96b8c9-51a1-40cf-b8b1-4514be8e9668',
 	redirectUri: '/',
 	postLogoutRedirectUri: '/',
 };

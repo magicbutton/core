@@ -33,6 +33,7 @@ export type ServiceCallLogEntry = {
 };
 export type AuthSource = "MSAL" | "SharePoint" | "";
 export type MagicboxContextType = {
+  tenant: string,
   userProfile: UserProfile | null;
   session?: Session;
   version: number;
@@ -64,7 +65,7 @@ export type MagicboxContextType = {
   initializing: boolean;
   setInitializing: (initializing: boolean) => void;
   hasAppRole(role: appRoleTypes): boolean;
-
+  setTenant: (tenant: string) => void;
 
 };
 export const MagicboxContext = createContext<MagicboxContextType>({
@@ -126,6 +127,10 @@ export const MagicboxContext = createContext<MagicboxContextType>({
   },
   userProfile: null,
   hasAppRole: function (role: "superadmin" | "dev" | "ring1"): boolean {
+    throw new Error("Function not implemented.");
+  },
+  tenant: "",
+  setTenant: function (tenant: string): void {
     throw new Error("Function not implemented.");
   }
 });

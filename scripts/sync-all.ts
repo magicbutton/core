@@ -11,7 +11,7 @@ import { write } from 'fs';
 async function main() {
 	const app = new ToolsApp();
 
-	await app.syncronizeAll({ force: true });
+	//await app.syncronizeAll({ force: true });
 	//await app.syncUserProfiles({ createOnly: true, force: false });
 	console.log('done');
 }

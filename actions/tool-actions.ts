@@ -61,16 +61,11 @@ export async function actionToolSaveCopy(
 	try {
 		toolRecord = await prisma.tool.create({
 			data: {
+				tenant: 'default',
 				name: name,
 				created_by: user.name,
 				updated_by: user.name,
 				url: '',
-				category: {
-					connectOrCreate: {
-						where: { name: 'Personal' },
-						create: { name: 'Personal' },
-					},
-				},
 			},
 		});
 		result = true;

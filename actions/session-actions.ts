@@ -33,6 +33,7 @@ export async function actionSignIn(accessToken: string): Promise<string> {
 
 		const user = await prisma.userProfile.upsert({
 			where: {
+				tenant: 'default',
 				email: upn,
 			},
 			update: {
@@ -40,6 +41,7 @@ export async function actionSignIn(accessToken: string): Promise<string> {
 				updated_by: 'system',
 			},
 			create: {
+				tenant: 'default',
 				email: upn,
 				name: upn,
 				displayName: token.name,

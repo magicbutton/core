@@ -92,6 +92,7 @@ export async function syncUserProfiles(
 					graphUser.displayName = graphUser.displayName.replaceAll('\u0000', '');
 					const newRecord = await prisma.userProfile.create({
 						data: {
+							tenant: 'default',
 							created_at: new Date(),
 							created_by: 'system',
 							updated_at: new Date(),
