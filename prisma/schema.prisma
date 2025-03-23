@@ -14,13 +14,27 @@ generator client {
 // }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("TOOL_DATABASE_URL")
-  schemas  = ["services", "tools"]
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+  schemas   = ["core"]
+}
+
+model Tenant {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  slug      String   @unique
+  domains   String[] // Array of domains associated with this tenant
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@schema("core")
 }
 
 model SynchronizationLog {
   id          Int       @id @default(autoincrement())
+  tenant      String
   created_at  DateTime  @default(now()) @db.Timestamptz(6)
   created_by  String?   @db.VarChar
   updated_at  DateTime  @default(now()) @db.Timestamptz(6)
@@ -33,26 +47,29 @@ model SynchronizationLog {
   hasError    Boolean   @db.Boolean
   error       String?   @db.VarChar
 
-  @@schema("tools")
+  @@schema("core")
 }
 
 model AccessPoint {
   id           Int       @id @default(autoincrement())
+  tenant       String
   created_at   DateTime  @default(now()) @db.Timestamptz(6)
   created_by   String?   @db.VarChar
   updated_at   DateTime  @default(now()) @db.Timestamptz(6)
   updated_by   String?   @db.VarChar
   deleted_at   DateTime? @db.Timestamptz(6)
-  name         String    @unique(map: "unique_accesspoint_name") @db.VarChar
+  name         String    @db.VarChar
   description  String?   @db.VarChar
   translations Json?
   sortorder    String?   @db.VarChar
 
-  @@schema("tools")
+  @@unique([tenant, name])
+  @@schema("core")
 }
 
 model AuditLog {
   id           Int       @id @default(autoincrement())
+  tenant       String
   created_at   DateTime  @default(now()) @db.Timestamptz(6)
   created_by   String?   @db.VarChar
   updated_at   DateTime  @default(now()) @db.Timestamptz(6)
@@ -68,11 +85,12 @@ model AuditLog {
   actor        String    @db.VarChar
   metadata     Json?
 
-  @@schema("tools")
+  @@schema("core")
 }
 
 model Board {
   id            Int           @id @default(autoincrement())
+  tenant        String
   created_at    DateTime      @default(now()) @db.Timestamptz(6)
   created_by    String?       @db.VarChar
   updated_at    DateTime      @default(now()) @db.Timestamptz(6)
@@ -91,17 +109,18 @@ model Board {
   groupOwnerId  String?       @db.VarChar
   groupViewerId String?       @db.VarChar
 
-  @@schema("tools")
+  @@schema("core")
 }
 
 model Category {
   id           Int       @id @default(autoincrement())
+  tenant       String
   created_at   DateTime  @default(now()) @db.Timestamptz(6)
   created_by   String?   @db.VarChar
   updated_at   DateTime  @default(now()) @db.Timestamptz(6)
   updated_by   String?   @db.VarChar
   deleted_at   DateTime? @db.Timestamptz(6)
-  name         String    @unique(map: "unique_category_name") @db.VarChar
+  name         String    @db.VarChar
   description  String?   @db.VarChar
   translations Json?
   sortorder    String?   @db.VarChar
@@ -109,17 +128,19 @@ model Category {
   isGroupTool  Boolean?  @default(false) @db.Boolean
   tool         Tool[]
 
-  @@schema("tools")
+  @@unique([tenant, name])
+  @@schema("core")
 }
 
 model Country {
   id           Int       @id @default(autoincrement())
+  tenant       String
   created_at   DateTime  @default(now()) @db.Timestamptz(6)
   created_by   String?   @db.VarChar
   updated_at   DateTime  @default(now()) @db.Timestamptz(6)
   updated_by   String?   @db.VarChar
   deleted_at   DateTime? @db.Timestamptz(6)
-  name         String    @unique(map: "unique_country_name") @db.VarChar
+  name         String    @db.VarChar
   description  String?   @db.VarChar
   translations Json?
   region_id    Int
@@ -130,34 +151,38 @@ model Country {
   homePageUrl  String?
   tools        Tool[]
 
-  @@schema("tools")
+  @@unique([tenant, name])
+  @@schema("core")
 }
 
 model Language {
   id           Int         @id @default(autoincrement())
+  tenant       String
   created_at   DateTime    @default(now()) @db.Timestamptz(6)
   created_by   String?     @db.VarChar
   updated_at   DateTime    @default(now()) @db.Timestamptz(6)
   updated_by   String?     @db.VarChar
   deleted_at   DateTime?   @db.Timestamptz(6)
-  name         String      @unique(map: "unique_language_name") @db.VarChar
+  name         String      @db.VarChar
   description  String?     @db.VarChar
   translations Json?
   code         String      @db.VarChar
   sortorder    String?     @db.VarChar
   ToolTexts    ToolTexts[]
 
-  @@schema("tools")
+  @@unique([tenant, name])
+  @@schema("core")
 }
 
 model Purpose {
   id           Int       @id @default(autoincrement())
+  tenant       String
   created_at   DateTime  @default(now()) @db.Timestamptz(6)
   created_by   String?   @db.VarChar
   updated_at   DateTime  @default(now()) @db.Timestamptz(6)
   updated_by   String?   @db.VarChar
   deleted_at   DateTime? @db.Timestamptz(6)
-  name         String    @unique(map: "unique_purpose_name") @db.VarChar
+  name         String    @db.VarChar
   description  String?   @db.VarChar
   translations Json?
   sortorder    String?   @db.VarChar
@@ -165,28 +190,32 @@ model Purpose {
   // Many-to-many relation with Tool
   tools Tool[] @relation("ToolPurposes")
 
-  @@schema("tools")
+  @@unique([tenant, name])
+  @@schema("core")
 }
 
 model Region {
   id           Int       @id @default(autoincrement())
+  tenant       String
   created_at   DateTime  @default(now()) @db.Timestamptz(6)
   created_by   String?   @db.VarChar
   updated_at   DateTime  @default(now()) @db.Timestamptz(6)
   updated_by   String?   @db.VarChar
   deleted_at   DateTime? @db.Timestamptz(6)
-  name         String    @unique(map: "unique_region_name") @db.VarChar
+  name         String    @db.VarChar
   description  String?   @db.VarChar
   translations Json?
   sortOrder    String?   @db.VarChar
   Country      Country[]
   Channel      Channel[]
 
-  @@schema("tools")
+  @@unique([tenant, name])
+  @@schema("core")
 }
 
 model Setting {
   id           Int       @id @default(autoincrement())
+  tenant       String
   created_at   DateTime  @default(now()) @db.Timestamptz(6)
   created_by   String?   @db.VarChar
   updated_at   DateTime  @default(now()) @db.Timestamptz(6)
@@ -197,7 +226,8 @@ model Setting {
   translations Json?
   data         Json?
 
-  @@schema("tools")
+  @@unique([tenant, name])
+  @@schema("core")
 }
 
 /// Tool
@@ -208,6 +238,7 @@ model Setting {
 
 model Tool {
   id                      Int           @id @default(autoincrement())
+  tenant                  String
   created_at              DateTime      @default(now()) @db.Timestamptz(6)
   created_by              String?       @db.VarChar
   updated_at              DateTime      @default(now()) @db.Timestamptz(6)
@@ -239,11 +270,12 @@ model Tool {
   groupViewerId           String?       @db.VarChar
   Blob                    Blob[]
 
-  @@schema("tools")
+  @@schema("core")
 }
 
 model ToolTexts {
   id          Int       @id @default(autoincrement())
+  tenant      String
   created_at  DateTime  @default(now()) @db.Timestamptz(6)
   created_by  String?   @db.VarChar
   updated_at  DateTime  @default(now()) @db.Timestamptz(6)
@@ -260,7 +292,7 @@ model ToolTexts {
 
   // Add a composite unique constraint with an explicit name:
   @@unique([toolId, languageId], name: "toolId_languageId")
-  @@schema("tools")
+  @@schema("core")
 }
 
 enum Status {
@@ -268,17 +300,18 @@ enum Status {
   GROUP
   PERSONAL
 
-  @@schema("tools")
+  @@schema("core")
 }
 
 model ToolGroup {
   id           Int           @id @default(autoincrement())
+  tenant       String
   created_at   DateTime      @default(now()) @db.Timestamptz(6)
   created_by   String?       @db.VarChar
   updated_at   DateTime      @default(now()) @db.Timestamptz(6)
   updated_by   String?       @db.VarChar
   deleted_at   DateTime?     @db.Timestamptz(6)
-  name         String        @unique(map: "unique_toolgroup_name") @db.VarChar
+  name         String        @db.VarChar
   description  String?       @db.VarChar
   translations Json?
   status       String?       @db.VarChar
@@ -287,28 +320,32 @@ model ToolGroup {
   visibility   Status        @default(PERSONAL)
   userGroups   UserGroup[]
 
-  @@schema("tools")
+  @@unique([tenant, name])
+  @@schema("core")
 }
 
 model UserGroup {
   id           Int       @id @default(autoincrement())
+  tenant       String
   created_at   DateTime  @default(now()) @db.Timestamptz(6)
   created_by   String?   @db.VarChar
   updated_at   DateTime  @default(now()) @db.Timestamptz(6)
   updated_by   String?   @db.VarChar
   deleted_at   DateTime? @db.Timestamptz(6)
-  name         String    @unique(map: "unique_usergroup_name") @db.VarChar
+  name         String    @db.VarChar
   description  String?   @db.VarChar
   translations Json?
   sortorder    String?   @db.VarChar
 
   ToolGroup ToolGroup[]
 
-  @@schema("tools")
+  @@unique([tenant, name])
+  @@schema("core")
 }
 
 model UserProfile {
   id                      Int       @id @default(autoincrement())
+  tenant                  String
   created_at              DateTime  @default(now()) @db.Timestamptz(6)
   created_by              String?   @db.VarChar
   updated_at              DateTime  @default(now()) @db.Timestamptz(6)
@@ -317,7 +354,7 @@ model UserProfile {
   koksmat_masterdataref   String?   @db.VarChar
   koksmat_masterdata_id   String?   @db.VarChar
   koksmat_masterdata_etag String?   @db.VarChar
-  name                    String    @unique(map: "unique_userprofile_name") @db.VarChar
+  name                    String    @db.VarChar
   displayName             String?   @db.VarChar
   description             String?   @db.VarChar
   translations            Json?
@@ -341,27 +378,31 @@ model UserProfile {
   language  String?     @db.VarChar
   homePage  String?
 
-  @@schema("tools")
+  @@unique([tenant, name])
+  @@schema("core")
 }
 
 model UserRole {
   id           Int           @id @default(autoincrement())
+  tenant       String
   created_at   DateTime      @default(now()) @db.Timestamptz(6)
   created_by   String?       @db.VarChar
   updated_at   DateTime      @default(now()) @db.Timestamptz(6)
   updated_by   String?       @db.VarChar
   deleted_at   DateTime?     @db.Timestamptz(6)
-  name         String        @unique(map: "unique_userrole_name") @db.VarChar
+  name         String        @db.VarChar
   description  String?       @db.VarChar
   translations Json?
   sortorder    String?       @db.VarChar
   users        UserProfile[]
 
-  @@schema("tools")
+  @@unique([tenant, name])
+  @@schema("core")
 }
 
 model Session {
   id            Int         @id @default(autoincrement())
+  tenant        String
   created_at    DateTime    @default(now()) @db.Timestamptz(6)
   created_by    String?     @db.VarChar
   updated_at    DateTime    @default(now()) @db.Timestamptz(6)
@@ -372,18 +413,19 @@ model Session {
   user          UserProfile @relation(fields: [userProfileId], references: [id])
   userProfileId Int
 
-  @@schema("tools")
+  @@schema("core")
 }
 
 model BusinessUnit {
   id              Int       @id @default(autoincrement())
+  tenant          String
   created_at      DateTime  @default(now()) @db.Timestamptz(6)
   created_by      String?   @db.VarChar
   updated_at      DateTime  @default(now()) @db.Timestamptz(6)
   updated_by      String?   @db.VarChar
   deleted_at      DateTime? @db.Timestamptz(6)
-  name            String    @unique(map: "unique_businessunit_name") @db.VarChar
-  code            String?   @unique(map: "unique_businessunit_code") @db.VarChar
+  name            String    @db.VarChar
+  code            String?   @db.VarChar
   description     String?   @db.VarChar
   translations    Json?
   sortorder       String?   @db.VarChar
@@ -391,48 +433,55 @@ model BusinessUnit {
   homePageUrl     String?
   newsPageUrl     String?
 
-  @@schema("tools")
+  @@unique([tenant, name])
+  @@unique([tenant, code])
+  @@schema("core")
 }
 
 model GuestDomain {
   id           Int       @id @default(autoincrement())
+  tenant       String
   created_at   DateTime  @default(now()) @db.Timestamptz(6)
   created_by   String?   @db.VarChar
   updated_at   DateTime  @default(now()) @db.Timestamptz(6)
   updated_by   String?   @db.VarChar
   deleted_at   DateTime? @db.Timestamptz(6)
-  name         String    @unique(map: "unique_guestdomain_name") @db.VarChar
+  name         String    @db.VarChar
   description  String?   @db.VarChar
   translations Json?
   sortorder    String?   @db.VarChar
 
-  @@schema("tools")
+  @@unique([tenant, name])
+  @@schema("core")
 }
 
 model ChannelCategory {
   id           Int       @id @default(autoincrement())
+  tenant       String
   created_at   DateTime  @default(now()) @db.Timestamptz(6)
   created_by   String?   @db.VarChar
   updated_at   DateTime  @default(now()) @db.Timestamptz(6)
   updated_by   String?   @db.VarChar
   deleted_at   DateTime? @db.Timestamptz(6)
-  name         String    @unique(map: "unique_channelcategory_name") @db.VarChar
+  name         String    @db.VarChar
   description  String?   @db.VarChar
   translations Json?
   sortorder    String?   @db.VarChar
   Channel      Channel[]
 
-  @@schema("tools")
+  @@unique([tenant, name])
+  @@schema("core")
 }
 
 model Channel {
   id            Int              @id @default(autoincrement())
+  tenant        String
   created_at    DateTime         @default(now()) @db.Timestamptz(6)
   created_by    String?          @db.VarChar
   updated_at    DateTime         @default(now()) @db.Timestamptz(6)
   updated_by    String?          @db.VarChar
   deleted_at    DateTime?        @db.Timestamptz(6)
-  name          String           @unique(map: "unique_channel_name") @db.VarChar
+  name          String           @db.VarChar
   description   String?          @db.VarChar
   mandatory     Boolean          @default(false) @db.Boolean
   translations  Json?
@@ -445,18 +494,20 @@ model Channel {
   category      ChannelCategory? @relation(fields: [categoryId], references: [id])
   categoryId    Int?
 
-  @@schema("tools")
+  @@unique([tenant, name])
+  @@schema("core")
 }
 
 model Blob {
   id             Int           @id @default(autoincrement())
+  tenant         String
   created_at     DateTime      @default(now()) @db.Timestamptz(6)
   created_by     String?       @db.VarChar
   updated_at     DateTime      @default(now()) @db.Timestamptz(6)
   updated_by     String?       @db.VarChar
   deleted_at     DateTime?     @db.Timestamptz(6)
   name           String        @db.VarChar
-  hash           String        @unique(map: "unique_blob_hash") @db.VarChar
+  hash           String        @db.VarChar
   content_type   String        @db.VarChar
   base64         String        @db.Text
   data           Bytes
@@ -464,23 +515,26 @@ model Blob {
   source_tool_id Int?
   BlobResized    BlobResized[]
 
-  @@schema("tools")
+  @@unique([tenant, name])
+  @@schema("core")
 }
 
 model BlobResized {
-  id     Int   @id @default(autoincrement())
-  width  Int   @db.Integer
+  id     Int    @id @default(autoincrement())
+  tenant String
+  width  Int    @db.Integer
   data   Bytes
-  blob   Blob  @relation(fields: [blobId], references: [id])
+  blob   Blob   @relation(fields: [blobId], references: [id])
   blobId Int
 
-  @@schema("tools")
+  @@schema("core")
 }
 
 // Service model to store information about each microservice
 model ServicesService {
   id                String                @id @default(cuid())
-  name              String                @unique // e.g., "user.create"
+  tenant            String
+  name              String
   purpose           String // e.g., "Creates a new user account"
   createdAt         DateTime              @default(now())
   updatedAt         DateTime              @updatedAt
@@ -494,25 +548,29 @@ model ServicesService {
   tags              ServicesTag[]         @relation("ServiceToTag")
   usageRecords      ServicesUsageRecord[]
 
+  @@unique([tenant, name])
   @@index([name])
-  @@schema("services")
+  @@schema("core")
 }
 
 // Tag model for categorizing services
 model ServicesTag {
   id        String            @id @default(cuid())
-  name      String            @unique // e.g., "user", "auth", "payment"
+  tenant    String
+  name      String
   services  ServicesService[] @relation("ServiceToTag")
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
 
+  @@unique([tenant, name])
   @@index([name])
-  @@schema("services")
+  @@schema("core")
 }
 
 // Endpoint model to store information about each service endpoint
 model ServicesEndpoint {
   id                String                  @id @default(cuid())
+  tenant            String
   name              String // e.g., "createUser"
   description       String // e.g., "Creates a new user in the system"
   version           String // e.g., "1.0.0"
@@ -530,16 +588,17 @@ model ServicesEndpoint {
   responseSchema    ServicesResponseSchema?
   usageRecords      ServicesUsageRecord[]
 
-  @@unique([serviceId, name, version])
+  @@unique([tenant, serviceId, name, version])
   @@index([name])
   @@index([deprecated])
   @@index([version])
-  @@schema("services")
+  @@schema("core")
 }
 
 // Parameter model to store information about endpoint parameters
 model ServicesParameter {
   id          String           @id @default(cuid())
+  tenant      String
   name        String // e.g., "username"
   type        String // e.g., "string", "number", "boolean", "object", "array"
   required    Boolean          @default(false)
@@ -552,12 +611,13 @@ model ServicesParameter {
   @@unique([endpointId, name])
   @@index([name])
   @@index([type])
-  @@schema("services")
+  @@schema("core")
 }
 
 // ResponseSchema model to store information about endpoint response schemas
 model ServicesResponseSchema {
   id         String                   @id @default(cuid())
+  tenant     String
   type       String // e.g., "object"
   createdAt  DateTime                 @default(now())
   updatedAt  DateTime                 @updatedAt
@@ -565,12 +625,13 @@ model ServicesResponseSchema {
   endpointId String                   @unique
   properties ServicesSchemaProperty[]
 
-  @@schema("services")
+  @@schema("core")
 }
 
 // SchemaProperty model to store information about response schema properties
 model ServicesSchemaProperty {
   id               String                 @id @default(cuid())
+  tenant           String
   name             String // e.g., "userId"
   type             String // e.g., "string", "number", "boolean", "object", "array"
   description      String // e.g., "Unique identifier for the created user"
@@ -583,12 +644,13 @@ model ServicesSchemaProperty {
   @@unique([responseSchemaId, name])
   @@index([name])
   @@index([type])
-  @@schema("services")
+  @@schema("core")
 }
 
 // RequestLog model to store information about service requests
 model ServicesRequestLog {
   id             String   @id @default(cuid())
+  tenant         String
   serviceName    String // e.g., "user.create"
   endpointName   String? // e.g., "createUser"
   requestId      String   @unique // A unique identifier for the request
@@ -607,12 +669,13 @@ model ServicesRequestLog {
   @@index([status])
   @@index([createdAt])
   @@index([apiKeyId])
-  @@schema("services")
+  @@schema("core")
 }
 
 // ApiKey model for authentication
 model ServicesApiKey {
   id                String                @id @default(cuid())
+  tenant            String
   key               String                @unique
   name              String // A friendly name for the key
   description       String?
@@ -629,12 +692,13 @@ model ServicesApiKey {
 
   @@index([key])
   @@index([active])
-  @@schema("services")
+  @@schema("core")
 }
 
 // UsageRecord model to track usage for throttling
 model ServicesUsageRecord {
   id         String            @id @default(cuid())
+  tenant     String
   serviceId  String?
   endpointId String?
   apiKeyId   String?
@@ -665,5 +729,5 @@ model ServicesUsageRecord {
   @@index([hour])
   @@index([day])
   @@index([clientIp])
-  @@schema("services")
+  @@schema("core")
 }
